@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 5px;
+      margin-bottom: 20px;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      border: 1px solid #999;
+      text-align: center;
+      font-size: 72px;
+      line-height: 100px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .cell:hover {
+      background-color: #eee;
+    }
+    .player {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .winner {
+      color: green;
+    }
+    #game-log {
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+    #game-log h3 {
+      margin-bottom: 10px;
+    }
+    #game-log p {
+      margin: 5px 0;
+    }
+  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="CSR.png">
+</head>
+<body>
+  <img class="logo" src="CSR.png" alt="Logo">
+  <h1>Tic Tac Toe</h1>
+      
+  <div>
+    <label for="player1">Player 1 Name:</label>
+    <input type="text" id="player1" placeholder="Player 1">
+    <label for="player2">Player 2 Name:</label>
+    <input type="text" id="player2" placeholder="Player 2">
+  </div>
+  <div class="board"></div>
+  <div id="game-log"></div>
+
+  <script>
+    var currentPlayer = 'X';
+    var moves = 0;
+    var gameLog = [];
+
+    function handleCellClick(cell) {
+      if (cell.textContent === '') {
+        cell.textContent = currentPlayer;
+        cell.classList.add('player', currentPlayer);
+        moves++;
+
+        if (checkWinner(currentPlayer)) {
+          announceWinner(currentPlayer);
+          updateGameLog();
+          resetGame();
+          return;
+        }
+
+        if (moves === 9) {
+          announceDraw();
+          updateGameLog();
+          resetGame();
+          return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      }
+    }
+
+    function checkWinner(player) {
+      var cells = document.getElementsByClassName('cell');
+      var winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6] // Diagonals
+      ];
+
+      for (var i = 0; i < winningCombinations.length; i++) {
+        var [a, b, c] = winningCombinations[i];
+        if (
+          cells[a].textContent === player &&
+          cells[b].textContent === player &&
+          cells[c].textContent === player
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+    function announceWinner(player) {
+  var winnerName = player === 'X' ? document.getElementById('player1').value : document.getElementById('player2').value;
+  var message = `Congratulations ${winnerName}! You won!`;
+  var gameLogEntry = { date: new Date().toLocaleString(), player: winnerName, result: 'Won' };
+  gameLog.push(gameLogEntry);
+
+  var gameLogElement = document.getElementById('game-log');
+  gameLogElement.innerHTML = `<p class="winner">${message}</p>` + gameLogElement.innerHTML;
+}
+
+function announceDraw() {
+  var message = 'It\'s a draw!';
+  var gameLogEntry = { date: new Date().toLocaleString(), player: 'Draw', result: 'Draw' };
+  gameLog.push(gameLogEntry);
+
+  var gameLogElement = document.getElementById('game-log');
+  gameLogElement.innerHTML = `<p>${message}</p>` + gameLogElement.innerHTML;
+}
+
+function updateGameLog() {
+  var gameLogElement = document.getElementById('game-log');
+  gameLogElement.innerHTML = '<h3>Last 10 Games:</h3>';
+
+  for (var i = 0; i < gameLog.length && i < 10; i++) {
+    var game = gameLog[i];
+    gameLogElement.innerHTML += `<p>${game.date} - ${game.player} (${game.result})</p>`;
+  }
+}
+
+function resetGame() {
+  var cells = document.getElementsByClassName('cell');
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].textContent = '';
+    cells[i].classList.remove('player', 'X', 'O');
+  }
+  currentPlayer = 'X';
+  moves = 0;
+}
+
+function initializeGame() {
+  var board = document.querySelector('.board');
+  var cells = [];
+
+  for (var i = 0; i < 9; i++) {
+    var cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.addEventListener('click', function() {
+      handleCellClick(this);
+    });
+    board.appendChild(cell);
+    cells.push(cell);
+  }
+}
+
+initializeGame();
+  </script>
+</body>
+</html>
